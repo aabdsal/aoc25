@@ -5,11 +5,40 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
-#include <algorithm>
+#include <random>
 
 using namespace std;
 
 typedef long long ll;
+
+random_device rd;  // Objeto para generar semillas aleatorias
+mt19937 gen(rd()); // Tret de internet clarament
+
+void quick_sort(vector<pair<ll, ll>> &arr, int izq, int der) // Tindre que implementar aso en un vector de pairs me mata i molt
+{
+    int i = izq, j = der;
+    ll tmp;
+    uniform_int_distribution<> dis(izq, der);
+    ll pivote = arr[dis(gen)].first;
+    while (i <= j)
+    {
+        while (arr[i].first < pivote)
+            i++;
+        while (arr[j].first > pivote)
+            j--;
+        if (i <= j)
+        {
+            swap(arr[i], arr[j]);
+            i++;
+            j--;
+        }
+    }
+
+    if (izq < j)
+        quick_sort(arr, izq, j);
+    if (i < der)
+        quick_sort(arr, i, der);
+}
 
 int main(void)
 {
@@ -36,7 +65,7 @@ int main(void)
         rangos.push_back({minimo, maximo});
     }
     archivo.close();
-    sort(rangos.begin(), rangos.end());
+    quick_sort(rangos, 0, rangos.size() - 1);
 
     vector<pair<ll, ll>> rangos_unidos;
     if (!rangos.empty())
