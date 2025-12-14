@@ -12,17 +12,12 @@ Repositorio para subir los códigos y las explicaciones de los problemas del Adv
     
 ---
 ## Entregables del proyecto
-Dia 3: parte2: Uso de Stack y Algortimo Voraz (Greedy).
 
 Dia 3/Ali: Programación dinámica maximizando el resultado (Ambas partes, corrige el que quieras).
 
-Dia 4: Archivo "Dia4Completo.cpp": Uso de grafos para contar cuantos vecinos tiene.
+Dia 5 : 
 
-Dia 5/Ali : Uso de LinkedList (Ambas partes, corrige el que quieras).
-
-Dia 7, parte 2: Uso de Programacion dinamica para evitar recalcular subproblemas superpuestos.
-
-Dia 8: (Ambas partes, corrige el que quieras) Uso de DyV para implementar algoritmos de ordenacion como QuickSort, uso de estructurad de datos como Priority_Queue y uso de DSU (Disjoint Set Union) para crear los conjuntos (conexiones) y saber a que conjunto pertenece cada "conexion".
+Dia 11 :
 
 > Dentro de la carpeta de los días que entregamos, encontrarás un breve README explicando la forma en la que se ha resuelto el problema y justificando el uso de la estructura
 ---
