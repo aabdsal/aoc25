@@ -13,6 +13,6 @@ A implementar la clase para usar grafos, a convinar implementacion de TablasHash
 Primero: Ir a la pagina web del Advent Of Code, entrar en el apartado de problemas propuestos del año 2025
 Segundo: Ir al Problema/Apartado 11 de los problemas que proponen y ver y copiar contenido de "get your puzzle input".
 Tercero: Pega el contenido en el archivo de este mismo directorio llamado "input.txt", reemplazando con tu input el contenido actual.
-Cuarto: Ya puedes compilar, en una terminal, asegurandote que estas en el directorio con los archivos, haz un "g++ -o nombreaelegir parte2.cpp.
+Cuarto: Ya puedes compilar, en una terminal, asegurandote que estas en el directorio con los archivos, haz un "g++ -o nombreaelegir parte2.cpp".
 Quinto: Simplemente ejecutalo, se te habra generado un archivo en el directorio llamado igual a "nombreaelegir", simplemente vuelve a escribir en la terminal "./nombreaelegir" y se ejecutara el archivo dandote la solucion al problema.
 PDD: Las comillas utilizadas son para recalcar y diferenciar la explicacion de las acciones, no tienes que colocarlas.
