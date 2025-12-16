@@ -4,10 +4,9 @@
 #include <iostream>
 #include <vector>
 #include <queue>
-#include <unordered_map>
+#include <map>
 #include <string>
 #include <fstream>
-#include <memory> // Para poder usar shared_ptr y que un nodo pueda tener punteros a otros nodos
 
 using namespace std;
 
@@ -28,18 +27,16 @@ public:
         return fila == (otra.fila) && (columna == otra.columna);
     }
 
+    bool operator<(const Posicion &otra) const // Para usar map en lugar de unordered_map
+    {
+        if (fila != otra.fila)
+            return fila < otra.fila;
+        return columna < otra.columna;
+    }
+
     void mostrar() const // Ho vaig fer per a enterarme de algo quan feia el debug, per a vore on tenia els errors
     {
         cout << "(" << fila << "," << columna << ")";
-    }
-};
-
-struct HashPosicion // Hash personalizada per a posicions, pero no esta implementada del tot, es com un acolxat per al unordered_map
-{
-    size_t operator()(const Posicion &p) const
-    {
-        // Combinamos los hashes de fila y columna
-        return hash<int>()(p.getFila()) ^ (hash<int>()(p.getColumna()) << 1);
     }
 };
 
@@ -49,7 +46,7 @@ private:
     Posicion posicion;
     int grado; // Cantidad de vecinos activos (no eliminados)
     bool eliminado;
-    vector<shared_ptr<Nodo>> vecinos; // Usamos shared_ptr para compartir nodos, que un nodo pueda tener punteros a otros nodos
+    vector<Posicion> vecinos; // Almacenamos posiciones en lugar de punteros
 
 public:
     // Constructor
@@ -63,33 +60,15 @@ public:
     // Setters
     void setGrado(int g) { grado = g; }
 
-    void agregarVecino(shared_ptr<Nodo> vecino) // Como unir los nodos (agregar un vecino) y se le aumenta el grado, usado mas adelante para comprobar los vecinos
+    void agregarVecino(const Posicion &vecino) // Como unir los nodos (agregar un vecino) y se le aumenta el grado
     {
         vecinos.push_back(vecino);
         grado++;
     }
 
-    bool eliminar() // Quan es comproba que te mes de 4 veïns, s'elimina i es redueix el grau dels veïns, per mantindreu tot actualitzat sense rerecórrer tot el grafo ni la matriu
-    {
-        if (eliminado)
-            return false; // Ya estaba eliminado
+    void setEliminado(bool e) { eliminado = e; }
 
-        eliminado = true;
-        grado = 0; // Un nodo eliminado no tiene grado
-
-        // Reducir el grado de todos los vecinos
-        for (auto &vecino : vecinos)
-        {
-            if (!vecino->estaEliminado())
-            {
-                vecino->reducirGrado();
-            }
-        }
-
-        return true;
-    }
-
-    void reducirGrado() // Asi es reduix el grau, emprleat en la fució eliminar (anterior)
+    void reducirGrado() // Asi es reduix el grau
     {
         if (!eliminado)
         {
@@ -97,7 +76,7 @@ public:
         }
     }
 
-    const vector<shared_ptr<Nodo>> &getVecinos() const
+    const vector<Posicion> &getVecinos() const
     {
         return vecinos;
     }
@@ -117,7 +96,7 @@ public:
 class GrafoRollos // I asi ja comencen els Grafos complets
 {
 private:
-    unordered_map<Posicion, shared_ptr<Nodo>, HashPosicion> nodos;
+    map<Posicion, Nodo> nodos;
     int filas;
     int columnas;
 
@@ -130,22 +109,21 @@ public:
         columnas = c;
     }
 
-    shared_ptr<Nodo> agregarNodo(const Posicion &pos)
+    void agregarNodo(const Posicion &pos)
     {
         if (nodos.find(pos) == nodos.end())
         {
-            nodos[pos] = make_shared<Nodo>(pos);
+            nodos.insert({pos, Nodo(pos)});
         }
-        return nodos[pos];
     }
 
-    shared_ptr<Nodo> obtenerNodo(const Posicion &pos) const
+    Nodo *obtenerNodo(const Posicion &pos)
     {
         auto it = nodos.find(pos);
-        return (it != nodos.end()) ? it->second : nullptr;
+        return (it != nodos.end()) ? &(it->second) : nullptr;
     }
 
-    const unordered_map<Posicion, shared_ptr<Nodo>, HashPosicion> &getNodos() const
+    const map<Posicion, Nodo> &getNodos() const
     {
         return nodos;
     }
@@ -175,7 +153,7 @@ public:
                 if (matriz[i][j] == '@')
                 {
                     Posicion posActual(i, j);
-                    auto nodoActual = obtenerNodo(posActual);
+                    Nodo *nodoActual = obtenerNodo(posActual);
 
                     for (int di = -1; di <= 1; di++) // Mirem a les 8 posicions veïnes
                     {
@@ -195,11 +173,11 @@ public:
                                 if (matriz[ni][nj] == '@')
                                 {
                                     Posicion posVecino(ni, nj);
-                                    auto nodoVecino = obtenerNodo(posVecino);
+                                    Nodo *nodoVecino = obtenerNodo(posVecino);
 
                                     // Conectar ambos nodos (grafo no dirigido)
-                                    nodoActual->agregarVecino(nodoVecino);
-                                    nodoVecino->agregarVecino(nodoActual);
+                                    nodoActual->agregarVecino(posVecino);
+                                    nodoVecino->agregarVecino(posActual);
                                 }
                             }
                         }
@@ -209,12 +187,12 @@ public:
         }
     }
 
-    int contarAccesiblesIniciales() const // Implementacio per a la part 1, ho faig perque per a la part 2 es necesita la 1 i com no em costaba res, pero fer grafos per a solucionar la part 1 es absurd
+    int contarAccesiblesIniciales() const
     {
         int contador = 0;
         for (const auto &par : nodos)
         {
-            if (par.second->esAccesible())
+            if (par.second.esAccesible())
             {
                 contador++;
             }
@@ -222,39 +200,44 @@ public:
         return contador;
     }
 
-    int eliminarEnCascada() // Esta es la part 2 en la que anem eliminant els Nodos en cascada que siguen accesibles (mes de 4 veins conectats ("@"))
+    int eliminarEnCascada()
     {
         int totalEliminados = 0;
-        queue<shared_ptr<Nodo>> cola;
+        queue<Posicion> cola;
 
         for (const auto &par : nodos)
         {
-            auto nodo = par.second;
-            if (nodo->esAccesible())
+            if (par.second.esAccesible())
             {
-                cola.push(nodo);
+                cola.push(par.first);
             }
         }
 
         while (!cola.empty())
         {
-            auto nodoActual = cola.front();
+            Posicion posActual = cola.front();
             cola.pop();
+
+            Nodo *nodoActual = obtenerNodo(posActual);
 
             if (nodoActual->estaEliminado() || !nodoActual->esAccesible())
             {
                 continue;
             }
 
-            if (nodoActual->eliminar())
-            {
-                totalEliminados++;
+            nodoActual->setEliminado(true);
+            totalEliminados++;
 
-                for (auto vecino : nodoActual->getVecinos())
+            // Reducir grado de vecinos
+            for (const Posicion &posVecino : nodoActual->getVecinos())
+            {
+                Nodo *vecino = obtenerNodo(posVecino);
+                if (!vecino->estaEliminado())
                 {
-                    if (!vecino->estaEliminado() && vecino->esAccesible())
+                    vecino->reducirGrado();
+                    if (vecino->esAccesible())
                     {
-                        cola.push(vecino);
+                        cola.push(posVecino);
                     }
                 }
             }
@@ -263,7 +246,7 @@ public:
         return totalEliminados;
     }
 
-    void mostrarEstado() const // Funció per a mostrar l'estat del grafo, per a debuguejar i no liarme
+    void mostrarEstado() const
     {
         cout << "=== ESTADO DEL GRAFO ===\n";
         cout << "Nodos totales: " << nodos.size() << "\n";
@@ -271,15 +254,14 @@ public:
         int activos = 0, eliminados = 0, accesibles = 0;
         for (const auto &par : nodos)
         {
-            auto nodo = par.second;
-            if (nodo->estaEliminado())
+            if (par.second.estaEliminado())
             {
                 eliminados++;
             }
             else
             {
                 activos++;
-                if (nodo->esAccesible())
+                if (par.second.esAccesible())
                 {
                     accesibles++;
                 }
@@ -294,7 +276,7 @@ public:
         for (const auto &par : nodos)
         {
             cout << "  ";
-            par.second->mostrar();
+            par.second.mostrar();
             cout << "\n";
         }
         cout << "======================\n";
