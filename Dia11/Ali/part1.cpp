@@ -5,9 +5,6 @@
 
 using namespace std;
 
-// He de crear una tabla hash que a la posicio aaa me duga a bbb i you
-// Al final lo dificil del grafo es el algoritme de busqueda, pero la estrucutra es una hash table
-
 class TableEntry
 {
 private:
@@ -15,11 +12,11 @@ private:
     vector<string> vecindario;
     bool visitado;
 public:
-	TableEntry(string key, string vecinos){
-		this->key = key;
-		this->vecindario.push_back(vecinos);
+    TableEntry(string key, string vecino){
+        this->key = key;
+        this->vecindario.push_back(vecino);
         this->visitado = false;
-	}
+    }
     string getKey(){
         return this->key;
     }
@@ -37,44 +34,48 @@ public:
     }
 };
 
-
 class HashTable
 {
 private:
     int n, max;
-    vector<vector<TableEntry>> tabla;
-	int hash(string key){
-		int res = 0;
-		for(int i = 0; i < key.length(); i++){	
-			res += key[i] - '0';
-		}
-		return res % max;
-	}
+    vector<vector<TableEntry> > tabla;
+
+    int hash(string key){
+        int res = 0;
+        for(int i = 0; i < key.length(); i++){    
+            res += key[i] - '0';
+        }
+        return res % max;
+    }
+
 public:
     HashTable(int size){
         tabla.resize(size);
         max = size;
         n = 0;
     }
+    HashTable(){}
 
-	void insert(string key, string vecinos){
+    void insert(string key, string vecino){
         int pos = hash(key);
         int i = search(key, pos);
-		if(i != -1){
-			tabla[pos][i].addVecino(vecinos);
-		}else{
-		    TableEntry aux = TableEntry(key, vecinos);
-		    tabla[pos].push_back(aux);
-		    n++;
+        if(i != -1){
+            tabla[pos][i].addVecino(vecino);
+        }else{
+            TableEntry aux = TableEntry(key, vecino);
+            tabla[pos].push_back(aux);
+            n++;
         }
-	}
-	int search(string key, int pos){
+    }
+
+    int search(string key, int pos){
         for (int i = 0; i < tabla[pos].size(); i++)
         {
             if (tabla[pos][i].getKey() == key) {return i;}
         }
         return -1;
-	}
+    }
+
     vector<string> getVecinos(string key){
         int pos = hash(key);
         int i = search(key, pos);
@@ -83,13 +84,15 @@ public:
         }
         return {};
     }
-    void marcarVisitado(string key, bool estado){
+
+    void setVisitado(string key, bool estado){
         int pos = hash(key);
         int i = search(key, pos);
         if(i != -1){
             tabla[pos][i].setVisitado(estado);
         }
     }
+
     bool esVisitado(string key){
         int pos = hash(key);
         int i = search(key, pos);
@@ -97,47 +100,66 @@ public:
             return tabla[pos][i].getVisitado();
         }
         return false;
-    }	
+    }
 };
 
-int contarCaminos(HashTable &h1, string desde, string hasta){ // recursivitat es una pila
-    if(desde == hasta) return 1;
-    vector <string> vecinos = h1.getVecinos(desde);
+class Grafo
+{
+private:
+    HashTable h1;
 
-    int total = 0;
-    h1.marcarVisitado(desde, true);
+public:
 
-    for (int i = 0; i < vecinos.size(); i++){
-        if (!h1.esVisitado(vecinos[i])){
-            total += contarCaminos(h1, vecinos[i], hasta);
-        }
+    Grafo(int size) : h1(size) {} // aso inicialisa de veritat el constructor, de la forma habitual soles asignaem
+
+    void insert(string key, string vecino) {
+        h1.insert(key, vecino);
     }
 
-    h1.marcarVisitado(desde, false);
-    return total;
-}
+    int contarCaminos(string desde, string hasta){ // recursivitat es una pila
+        if(desde == hasta) return 1;
+        vector<string> vecinos = h1.getVecinos(desde);
+        
+        int total = 0;
+        h1.setVisitado(desde, true);
+
+        for (int i = 0; i < vecinos.size(); i++){
+            if (!h1.esVisitado(vecinos[i])){
+                total += contarCaminos(vecinos[i], hasta);
+            }
+        }
+
+        h1.setVisitado(desde, false);
+        return total;
+    }
+};
 
 int main(int argc, char const *argv[])
 {
     ifstream fich("input.txt");
-    string l1;
-    int count = 0;
+    if (!fich.is_open()) {
+        cout << "Error al abrir el archivo" << endl;
+        return 1;
+    }
 
-    HashTable h1(559); // numero de linies del input
+    string l1;
+    Grafo grafo(559); // numero del linies del input
+
     while (getline(fich, l1))
     {
         int pos = l1.find(':');
         string key = l1.substr(0, pos);
 
-        string vecino = l1.substr(pos + 1);
-        stringstream ss (vecino);
+        string resto = l1.substr(pos + 1);
+        stringstream ss(resto);
+        string vecino;
 
         while(ss >> vecino){
-            h1.insert(key, vecino);
+            grafo.insert(key, vecino);
         }
     }
 
-    count = contarCaminos(h1, "you", "out");
+    int count = grafo.contarCaminos("you", "out");
 
     cout << count << endl;
     fich.close();

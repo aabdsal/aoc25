@@ -86,43 +86,59 @@ public:
     int getPos(string key){
         return hash(key);
     }
+    int getSize() { return max; }
+    int getBucketSize(int i) { return tabla[i].size(); }
+};
+class Grafo
+{
+private:
+    HashTable h1;
+
+public:
+
+    Grafo(int size) : h1(size) {} // aso inicialisa de veritat el constructor, de la forma habitual soles asignaem
+
+    void insert(string key, string vecino) {
+        h1.insert(key, vecino);
+    }
+
+    ull contarCaminos(string desde, string hasta, vector<vector<ull>> &memo){ // recursivitat es una pila
+        if (desde == hasta) return 1;
+
+        int pos = h1.getPos(desde);
+        int i = h1.search(desde, pos);
+
+        if (i == -1) return 0;
+
+        if (memo[pos][i] != -1) return memo[pos][i];
+
+        vector <string> vecinos = h1.getVecinos(desde);
+        ull total = 0;
+        
+        for (int i = 0; i < vecinos.size(); i++){
+            total += contarCaminos(vecinos[i], hasta, memo);
+        }
+
+        memo[pos][i] = total;
+        return total;
+    }
     // Gemini
     vector<vector<ull>> initMemo(){
-        vector<vector<ull>> memo(max);
-        for(int i = 0; i < max; i++){
-            memo[i].resize(tabla[i].size(), -1);
+        int size = h1.getSize();
+        vector<vector<ull>> memo(size);
+        for(int i = 0; i < size; i++){
+            memo[i].resize(h1.getBucketSize(i), -1);
         }
         return memo;
     }
 };
-
-ull contarCaminos(HashTable &h1, string desde, string hasta, vector<vector<ull>> &memo){
-    if (desde == hasta) return 1;
-
-    int pos = h1.getPos(desde);
-    int i = h1.search(desde, pos);
-
-    if (i == -1) return 0;
-
-    if (memo[pos][i] != -1) return memo[pos][i];
-
-    vector <string> vecinos = h1.getVecinos(desde);
-    ull total = 0;
-    
-    for (int i = 0; i < vecinos.size(); i++){
-        total += contarCaminos(h1, vecinos[i], hasta, memo);
-    }
-    
-    memo[pos][i] = total;
-    return total;
-}
 
 int main(int argc, char const *argv[])
 {
     ifstream fich("input.txt");
     string l1;
     
-    HashTable h1(559); // numero de linies del input
+    Grafo grafo(559); // numero de linies del input
     while (getline(fich, l1))
     {
         int pos = l1.find(':');
@@ -132,30 +148,30 @@ int main(int argc, char const *argv[])
         stringstream ss (vecino);
 
         while(ss >> vecino){
-            h1.insert(key, vecino);
+            grafo.insert(key, vecino);
         }
     }
 
     // Gemini
-    vector<vector<ull>> memo1 = h1.initMemo();
-    ull tramo1 = contarCaminos(h1, "svr", "dac", memo1);
+    vector<vector<ull>> memo1 = grafo.initMemo();
+    ull tramo1 = grafo.contarCaminos("svr", "dac", memo1);
     
-    vector<vector<ull>> memo2 = h1.initMemo();
-    ull tramo2 = contarCaminos(h1, "dac", "fft", memo2);
+    vector<vector<ull>> memo2 = grafo.initMemo();
+    ull tramo2 = grafo.contarCaminos("dac", "fft", memo2);
     
-    vector<vector<ull>> memo3 = h1.initMemo();
-    ull tramo3 = contarCaminos(h1, "fft", "out", memo3);
+    vector<vector<ull>> memo3 = grafo.initMemo();
+    ull tramo3 = grafo.contarCaminos("fft", "out", memo3);
     
     ull ruta1 = tramo1 * tramo2 * tramo3;
 
-    vector<vector<ull>> memo4 = h1.initMemo();
-    ull tramo4 = contarCaminos(h1, "svr", "fft", memo4);
+    vector<vector<ull>> memo4 = grafo.initMemo();
+    ull tramo4 = grafo.contarCaminos("svr", "fft", memo4);
     
-    vector<vector<ull>> memo5 = h1.initMemo();
-    ull tramo5 = contarCaminos(h1, "fft", "dac", memo5);
+    vector<vector<ull>> memo5 = grafo.initMemo();
+    ull tramo5 = grafo.contarCaminos("fft", "dac", memo5);
     
-    vector<vector<ull>> memo6 = h1.initMemo();
-    ull tramo6 = contarCaminos(h1, "dac", "out", memo6);
+    vector<vector<ull>> memo6 = grafo.initMemo();
+    ull tramo6 = grafo.contarCaminos("dac", "out", memo6);
     
     ull ruta2 = tramo4 * tramo5 * tramo6;
 
