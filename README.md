@@ -13,11 +13,11 @@ Repositorio para subir los códigos y las explicaciones de los problemas del Adv
 ---
 ## Entregables del proyecto
 
-Dia 3/Ali/part2.cpp: Programación dinámica maximizando el resultado.
+[Dia3/Ali/part2.cpp](Dia3/Ali/part2.cpp): Programación dinámica maximizando el resultado.
 
-Dia 5/Dia5Alternativo.cpp: Uso de arbol de intervalos para guardar y fusionar los intervalos dados.
+[Dia5/Dia5Alternativo.cpp](Dia5/Dia5Alternativo.cpp): Uso de arbol de intervalos para guardar y fusionar los intervalos dados.
 
-Dia 11/parte2.cpp: Implementacion de Grafos y una TablaHash usada para mapear de forma interna los nodos de los grafos para mayor velocidad.
+[Dia11/Ali/part1.cpp](Dia11/Ali/part1.cpp): Implementacion de Grafos y una TablaHash usada para mapear de forma interna los nodos de los grafos para mayor velocidad
 
 > Dentro de la carpeta de los días que entregamos, encontrarás un breve README explicando la forma en la que se ha resuelto el problema y justificando el uso de la estructura
 ---

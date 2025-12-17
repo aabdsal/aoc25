@@ -17,7 +17,7 @@ Primero: En una terminal, asegúrate de que estás en el directorio que contiene
 Primero: Ve a la página web del Advent of Code, accede a los problemas propuestos del año 2025.  
 Segundo: Dirígete al problema del día 3 y copia el contenido de "Get your puzzle input".  
 Tercero: Pega el contenido en el archivo `input.txt` de este directorio, reemplazando el contenido actual.  
-Cuarto: Compila el programa. En la terminal, dentro del directorio de los archivos, ejecuta `g++ -o <nombre_a_elegir> part2.cpp`.  
+Cuarto: Compila el programa. En la terminal, dentro del directorio de los archivos, ejecuta `g++ -stc=c++17 -o <nombre_a_elegir> part2.cpp`.  
 Quinto: Ejecuta el programa con `./<nombre_a_elegir>`. Esto te dará la solución para tu input.
 
 **PD:** Las comillas utilizadas en las instrucciones son para recalcar y diferenciar la explicación de las acciones; no es necesario escribirlas.
