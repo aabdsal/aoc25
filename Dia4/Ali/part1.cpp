@@ -26,6 +26,9 @@ bool esAccesible(vector <string> &matriu, int i, int j){
 int main(int argc, char const *argv[])
 {
     ifstream fich("input.txt");
+    if (!fich.is_open()) {
+        throw runtime_error("Error al abrir el archivo\n");
+    }
     string l1;
     long count = 0;
     vector <string> matriu;

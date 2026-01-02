@@ -107,6 +107,9 @@ public:
 int main(int argc, char const *argv[])
 {
     ifstream fich("input.txt");
+    if (!fich.is_open()) {
+        throw runtime_error("Error al abrir el archivo\n");
+    }
     string l1;
     ull count = 0;
     int flag = 1;

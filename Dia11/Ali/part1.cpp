@@ -140,8 +140,7 @@ int main()
 {
     ifstream fich("input.txt");
     if (!fich.is_open()) {
-        cout << "Error al abrir el archivo" << endl;
-        return 1;
+        throw runtime_error("Error al abrir el archivo\n");
     }
 
     string l1;

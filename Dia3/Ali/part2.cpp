@@ -34,6 +34,9 @@ long maxBat(string &l1, int i, int j, vector <vector<long> > &memo){
 int main(int argc, char const *argv[])
 {
     ifstream fich("input.txt");
+    if (!fich.is_open()) {
+        throw runtime_error("Error al abrir el archivo\n");
+    }
     string l1;
     long count = 0;  
     while (getline(fich, l1))

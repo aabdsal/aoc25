@@ -9,6 +9,9 @@ using namespace std;
 int main(int argc, char const *argv[])
 {
     ifstream fich("input.txt");
+    if (!fich.is_open()) {
+        throw runtime_error("Error al abrir el archivo\n");
+    }
     string l1;
     int count = 0, desplazamiento = INI;
     //cout << "The dial starts by pointing at 50." << endl;
